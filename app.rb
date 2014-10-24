@@ -26,11 +26,8 @@ class NDC9App < Sinatra::Base
       $redis.set isbn, ndc9
     end
 
-    content_type 'application/json'
-    {
-      :isbn => isbn,
-      :ndc9 => ndc9.to_s
-    }.to_json
+    content_type 'text/plain'
+    ndc9.to_s
   end
   
 end
