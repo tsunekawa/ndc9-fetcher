@@ -62,6 +62,10 @@ class NDC9App < Sinatra::Base
       error 406
     end
 
+    if data["isbn"].size <= 0 then
+      error 400
+    end
+
     request_id = NDC9.bulk_request(data["isbn"], {:cache=>cache})
 
     EM.defer do
