@@ -2,5 +2,9 @@ source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'redis'
-gem 'ndl_search'
 gem 'unicorn'
+gem 'nokogiri'
+
+gem 'bundler', require: [
+  "open-uri"
+]

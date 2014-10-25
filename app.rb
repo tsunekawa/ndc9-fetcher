@@ -21,8 +21,11 @@ class NDC9App < Sinatra::Base
     if cache and $redis.exists isbn then
       ndc9 = $redis.get isbn
     else
-      ns   = NDLSearch::NDLSearch.new
-      ndc9 = ns.search(:isbn=>isbn).items.first.ndc
+      result = Nokogiri::XML.parse(
+        open("http://iss.ndl.go.jp/api/opensearch?dpid=iss-ndl-opac&isbn=#{isbn}&mediatype=1").read
+      )
+     
+      ndc9 = result.xpath("//channel/item/dc:subject[@xsi:type='dcndl:NDC9']/text()").to_s 
       $redis.set isbn, ndc9
     end
 
