@@ -1,3 +1,3 @@
-require './app'
+require './config/boot'
 
 run NDC9App
