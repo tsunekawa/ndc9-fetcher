@@ -14,19 +14,25 @@ class NDC9App < Sinatra::Base
   register Sinatra::RespondWith
 
   # resolve url extention
-  before /\.+$/ do
+  before /\..+$/ do
     case request.url
     when /\.txt$/
       request.accept.unshift('text/plain')
-      request.path_info = request.path_info.gsub(/.text$/,'')
+      request.path_info = request.path_info.gsub(/.txt$/,'')
+    when /\.html$/
+      request.accept.unshift('text/html')
+      request.path_info = request.path_info.gsub(/.html$/,'')
     when /\.json$/
       request.accept.unshift('application/json')
       request.path_info = request.path_info.gsub(/.json$/,'')
     when /\.xml$/
-      request.accept.unshift('application/rdf+xml')
+      request.accept.unshift('application/xml')
       request.path_info = request.path_info.gsub(/.xml$/,'')
+    when /\.rdf$/
+      request.accept.unshift('application/rdf+xml')
+      request.path_info = request.path_info.gsub(/.rdf$/,'')
     else
-      halt 406
+      error 406
     end
   end
 
@@ -48,8 +54,9 @@ class NDC9App < Sinatra::Base
     respond_to do |f|
       f.html { ndc9.to_s }
       f.xml  { erb :'isbn.rdf', locals: {:isbn=>isbn, :ndc9=>ndc9} }
+      f.on('application/rdf+xml') { erb :'isbn.rdf', locals: {:isbn=>isbn, :ndc9=>ndc9} }
       f.json { {:isbn=>isbn, :ndc9=>ndc9.to_s}.to_json }
-      f.text { ndc9.to_s }
+      f.txt  { ndc9.to_s }
     end
   end
 
