@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>NDC9 Fetcher</title>
+  </head>
+  <body>
+  <h1>NDC9 Fetcher</h1>
+  <h2>このサービスについて</h2>
+  <ul>
+    <li>ISBNに対応するNDC番号を返すAPIサービスです。</li>
+    <li>NDC番号の取得にはNDLサーチの外部インターフェースを利用しています。</li>
+    <li>NDLサーチの外部インターフェースは非営利の場合のみ無許可で利用可能であるため、本APIサービスの利用は非営利に限定させていただきます。</li>
+  </ul>
+
+  <h2>APIの使用方法</h2>
+  <h3>特定のISBNからNDC番号を取得する場合</h3>
+  <ul>
+    <li>URL: http://<%= request.host_with_port %>/v1/isbn/(ISBN) </li>
+    <li>例:
+      <ul>
+        <li>テキスト形式で出力: <a href="http://<%= request.host_with_port %>/v1/isbn/978-4061190696">http://<%= request.host_with_port %>/v1/isbn/978-4061190696</a></li>
+        <li>JSON形式で出力:<a href="http://<%= request.host_with_port %>/v1/isbn/978-4061190696.json">http://<%= request.host_with_port %>/v1/isbn/978-4061190696.json</a></li>
+        <li>RDF/XML形式で出力:<a href="http://<%= request.host_with_port %>/v1/isbn/978-4061190696.xml">http://<%= request.host_with_port %>/v1/isbn/978-4061190696.xml</a></li>
+      </ul>
+    </li>
+  </ul>
+  </body>
+</html>

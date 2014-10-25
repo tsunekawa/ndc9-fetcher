@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcndl="http://ndl.go.jp/dcndl/terms/" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+>
+  <rdf:Description rdf:about="urn:isbn:<%= isbn %>">
+    <dc:subject xsi:type="dcndl:NDC9"><%= ndc9 %></dc:subject>
+  </rdf:Description>
+</rdf:RDF>
