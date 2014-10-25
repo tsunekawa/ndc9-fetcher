@@ -1,0 +1,10 @@
+{
+  "name": "NDC9 Fetcher",
+  "description": "A simple API server for NDC9 (Nippon Decimal Classification Version 9)",
+  "website": "https://github.com/tsunekawa/ndc9-fetcher",
+  "repository": "https://github.com/tsunekawa/ndc9-fetcher",
+  "keywords": ["ruby", "sinatra", "api-server", "NDC"],
+  "addons": [
+    "redistogo"
+  ]
+}
