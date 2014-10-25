@@ -89,7 +89,7 @@ class NDC9App < Sinatra::Base
     else
       status 200 # OK
       respond_to do |f|
-        f.html { erb :'bulk_get.html', locals: {:result=>result} }
+        f.html { erb :'bulk_get.html', locals: {:result=>result, :request_id=>params["request_id"]} }
         f.json { result.to_json }
         f.txt  { result.to_a.unshift(["isbn", "ndc9"]).map{|i| i.join("\t")}.join("\n") }
       end

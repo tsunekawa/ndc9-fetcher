@@ -1,62 +1,69 @@
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <title>NDC9 Fetcher</title>
-  </head>
-  <body>
-  <h1>NDC9 Fetcher</h1>
-  <h2>このサービスについて</h2>
-  <ul>
-    <li>ISBNに対応するNDC番号を返すAPIサービスです。</li>
-    <li>NDC番号の取得にはNDLサーチの外部インターフェースを利用しています。</li>
-    <li>NDLサーチの外部インターフェースは非営利の場合のみ無許可で利用可能であるため、本APIサービスの利用は非営利に限定させていただきます。</li>
-    <li>詳細: <a href="https://github.com/tsunekawa/ndc9-fetcher">GitHub: tsunekawa/ndc9-fetcher</a></li>
-  </ul>
+<div class="page-header">
+  <h1><a href="<%= root_path %>">NDC9 Fetcher <small>- A Simple API Server for NDC9</small></a></h1>
+</div>
 
-  <h2>APIの使用方法</h2>
-  <h3>特定のISBNからNDC番号を取得する場合</h3>
-  <ul>
-    <li>URL: http://<%= request.host_with_port %>/v1/isbn/(ISBN) </li>
-    <li>例:
+<div class="panel panel-primary" id="about">
+  <div class="panel-heading">
+    <h2 class="panel-title">このサービスについて</h2>
+  </div>
+  <div class="panel-body">
+    <ul>
+      <li>ISBNに対応するNDC番号を返すAPIサービスです。</li>
+      <li>NDC番号の取得にはNDLサーチの外部インターフェースを利用しています。</li>
+      <li>NDLサーチの外部インターフェースは非営利の場合のみ無許可で利用可能であるため、本APIサービスの利用は非営利に限定させていただきます。</li>
+      <li>詳細: <a href="https://github.com/tsunekawa/ndc9-fetcher">GitHub: tsunekawa/ndc9-fetcher</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="panel panel-primary" id="usage">
+  <div class="panel-heading">
+    <h2 class="panel-title">APIの使用方法</h2>
+  </div>
+  <div class="panel-body">
+    <h3>特定のISBNからNDC番号を取得する場合</h3>
+    <ul>
+      <li>URL: http://<%= request.host_with_port %>/v1/isbn/(ISBN) </li>
+      <li>例:
       <ul>
         <li>テキスト形式で出力： <a href="<%= root_path %>/v1/isbn/978-4061190696"><%= root_path %>/v1/isbn/978-4061190696</a></li>
         <li>JSON形式で出力： <a href="<%= root_path %>/v1/isbn/978-4061190696.json"><%= root_path %>/v1/isbn/978-4061190696.json</a></li>
         <li>RDF/XML形式で出力： <a href="<%= root_path %>/v1/isbn/978-4061190696.xml"><%= root_path %>/v1/isbn/978-4061190696.xml</a></li>
       </ul>
-    </li>
-  </ul>
-  <h3>複数のISBNからNDC番号を取得する場合</h3>
-  <p>大量のISBNにNDC番号を付与したい場合、1件ごとにリクエストするのが面倒な場合があります。そのような場合のために、本サービスではbulkモードという手法を提供しています。bulkモードでリクエストすると、リクエストIDが発行され、結果を得るためのURLにリダイレクトされます。処理が終わるまでは、処理中のメッセージが表示されます。すべてのISBNに対するNDC番号を取得し終えると、リダイレクト先の画面に結果が出力されます。</p>
-  <h4>ブラウザ経由でリクエストする</h4>
-  <p><a href="<%= root_path %>/bulk">リクエストフォーム</a>からリクエストしてください。</p>
-  <h4>プログラムからリクエストする</h4>
-  <ul>
-    <li>
+      </li>
+    </ul>
+    <h3>複数のISBNからNDC番号を取得する場合</h3>
+    <p>大量のISBNにNDC番号を付与したい場合、1件ごとにリクエストするのが面倒な場合があります。そのような場合のために、本サービスではbulkモードという手法を提供しています。bulkモードでリクエストすると、リクエストIDが発行され、結果を得るためのURLにリダイレクトされます。処理が終わるまでは、処理中のメッセージが表示されます。すべてのISBNに対するNDC番号を取得し終えると、リダイレクト先の画面に結果が出力されます。</p>
+    <h4>ブラウザ経由でリクエストする</h4>
+    <p><a href="<%= root_path %>/bulk">リクエストフォーム</a>からリクエストしてください。</p>
+    <h4>プログラムからリクエストする</h4>
+    <ul>
+      <li>
       リクエストの発行:
       <ul>
         <li>リクエストURL: <%= root_path %>/v1/isbn/bulk</li>
         <li>リクエストメソッド: POST</li>
         <li>リクエストデータの指定方法:
-          <ul>
-            <li>text/plain の場合: 1行ごとにISBNが記述されたテキストデータ</li>
-            <li>application/json の場合: {"isbn": [ (ISBNのリスト) ]}</li>
-          </ul>
+        <ul>
+          <li>text/plain の場合: 1行ごとにISBNが記述されたテキストデータ</li>
+          <li>application/json の場合: {"isbn": [ (ISBNのリスト) ]}</li>
+        </ul>
         </li>
       </ul>
-    </li>
-    <li>
+      </li>
+      <li>
       リクエスト結果の取得:
       <ul>
         <li>リクエストURL: <%= root_path %>/v1/isbn/bulk/(リクエストID)</li>
         <li>リクエストメソッド: GET</li>
         <li>出力形式の指定方法:
-          <ul>
-            <li>TSV形式: <%= root_path %>/v1/isbn/bulk/(リクエストID).txt</li>
-            <li>JSON形式: <%= root_path %>/v1/isbn/bulk/(リクエストID).json</li>
-          </ul>
+        <ul>
+          <li>TSV形式: <%= root_path %>/v1/isbn/bulk/(リクエストID).txt</li>
+          <li>JSON形式: <%= root_path %>/v1/isbn/bulk/(リクエストID).json</li>
+        </ul>
         </li>
       </ul>
-    </li>
-  </ul>
-  </body>
-</html>
+      </li>
+    </ul>
+  </div>
+</div>

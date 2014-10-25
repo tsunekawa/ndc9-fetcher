@@ -1,14 +1,19 @@
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <title>NDC9 Fetcher</title>
-  </head>
-  <body>
-  <h1>NDC9 Fetcher - bulkモード</h1>
-  <form method="POST" action="<%= root_path %>/v1/isbn/bulk">
-    <p>以下の入力欄に1行ごとにISBNを入力し、「送信」ボタンを押してください。</p>
-    <p><textarea name="isbn" rows="20" cols="50"></textarea></p>
-    <input type="submit" value="送信"></input>
-  </form>
-  </body>
-</html>
+<div class="page-header">
+  <h1><a href="<%= root_path %>">NDC9 Fetcher <small>- A Simple API Server for NDC9</small></a></h1>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">NDC9 Fetcher - bulkモード</h2>
+  </div>
+  <div class="panel-body">
+    <form role="form" method="POST" action="<%= root_path %>/v1/isbn/bulk">
+      <p>以下の入力欄に1行ごとにISBNを入力し、「送信」ボタンを押してください。</p>
+      <div class="form-group">
+        <label for="isbn">ISBN:</label>
+        <p><textarea id="isbn" name="isbn" rows="20" cols="50"></textarea></p>
+      </div>
+      <input class="btn btn-primary" type="submit" value="送信"></input>
+    </form>
+  </div>
+</div>
