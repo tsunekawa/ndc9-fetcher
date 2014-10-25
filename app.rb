@@ -16,7 +16,7 @@ class NDC9App < Sinatra::Base
 
   get '/v1/isbn/:isbn' do
     isbn =  params[:isbn].gsub("-","")
-    cache = params[:cache]=="true"
+    cache = (params[:cache] || "true")=="true"
 
     if cache and $redis.exists isbn then
       ndc9 = $redis.get isbn
