@@ -72,7 +72,11 @@ class NDC9App < Sinatra::Base
       NDC9.bulk_fetch(request_id)
     end
 
-    redirect "/v1/isbn/bulk/#{request_id}"
+    respond_to do |f|
+      f.html { redirect "/v1/isbn/bulk/#{request_id}" }
+      f.txt  { "request id: #{request_id}" }
+      f.json { {:request_id=>request_id}.to_json }
+    end
   end
 
   get '/v1/isbn/bulk/:request_id' do
@@ -85,6 +89,7 @@ class NDC9App < Sinatra::Base
     else
       status 200 # OK
       respond_to do |f|
+        f.html { erb :'bulk_get.html', locals: {:result=>result} }
         f.json { result.to_json }
         f.txt  { result.to_a.unshift(["isbn", "ndc9"]).map{|i| i.join("\t")}.join("\n") }
       end

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>NDC9 Fetcher</title>
+  </head>
+  <body>
+  <table>
+    <tr><th>ISBN</th><th>NDC9</th></tr>
+    <% result.each do |isbn, ndc| %>
+    <tr><td><%= isbn %></td><td><%= ndc %></td></tr>
+    <% end %>
+  </table>
+  </body>
+</html>

@@ -25,5 +25,38 @@
       </ul>
     </li>
   </ul>
+  <h3>複数のISBNからNDC番号を取得する場合</h3>
+  <p>大量のISBNにNDC番号を付与したい場合、1件ごとにリクエストするのが面倒な場合があります。そのような場合のために、本サービスではbulkモードという手法を提供しています。bulkモードでリクエストすると、リクエストIDが発行され、結果を得るためのURLにリダイレクトされます。処理が終わるまでは、処理中のメッセージが表示されます。すべてのISBNに対するNDC番号を取得し終えると、リダイレクト先の画面に結果が出力されます。</p>
+  <h4>ブラウザ経由でリクエストする</h4>
+  <p><a href="<%= root_path %>/bulk">リクエストフォーム</a>からリクエストしてください。</p>
+  <h4>プログラムからリクエストする</h4>
+  <ul>
+    <li>
+      リクエストの発行:
+      <ul>
+        <li>リクエストURL: <%= root_path %>/v1/isbn/bulk</li>
+        <li>リクエストメソッド: POST</li>
+        <li>リクエストデータの指定方法:
+          <ul>
+            <li>text/plain の場合: 1行ごとにISBNが記述されたテキストデータ</li>
+            <li>application/json の場合: {"isbn": [ (ISBNのリスト) ]}</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      リクエスト結果の取得:
+      <ul>
+        <li>リクエストURL: <%= root_path %>/v1/isbn/bulk/(リクエストID)</li>
+        <li>リクエストメソッド: GET</li>
+        <li>出力形式の指定方法:
+          <ul>
+            <li>TSV形式: <%= root_path %>/v1/isbn/bulk/(リクエストID).txt</li>
+            <li>JSON形式: <%= root_path %>/v1/isbn/bulk/(リクエストID).json</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
   </body>
 </html>
