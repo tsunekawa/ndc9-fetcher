@@ -74,6 +74,7 @@ class NDC9App < Sinatra::Base
         else
           value = yield
           $redis.set name, value
+          value
         end
       else
         yield
