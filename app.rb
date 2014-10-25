@@ -61,6 +61,10 @@ class NDC9App < Sinatra::Base
   end
 
   helpers do
+    def root_path
+      "#{request.scheme}://#{request.host_with_port}/"
+    end
+
     # cache and return value with Redis
     def cache(name, opts={}, &block)
       cache = opts[:cache]
