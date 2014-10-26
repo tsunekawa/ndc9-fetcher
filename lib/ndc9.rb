@@ -1,4 +1,6 @@
 module NDC9
+  BULK_EXPIRE = 43200 # 6 hours
+
   def self.last_request
     $redis.get "last_request"
   end
@@ -55,7 +57,7 @@ module NDC9
       end
     end
 
-    $redis.expire "result:#{request_id}", 43200 # 6 hours
+    $redis.expire "result:#{request_id}", BULK_EXPIRE
     $redis.del "request:#{request_id}"
 
     true
