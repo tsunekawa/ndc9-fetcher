@@ -20,7 +20,7 @@ class JobManager
     if request_id_list.empty? then
       nil
     else
-      request_id = request_id_list.sample.scan(/^request:(.+)$/).flatten.first
+      request_id = request_id_list.sample
       bulk_fetch(request_id)
       request_id
     end
@@ -46,7 +46,7 @@ class JobManager
   end
 
   def bulk_fetch(request_id)
-    raise ::RequestIDNotFound unless $redis.exists request_key_of(request_id)
+    raise ::RequestIDNotFoundError, request_id unless $redis.exists request_key_of(request_id)
     $redis.renamenx request_key_of(request_id), processing_key_of(request_id)
 
     while $redis.llen(processing_key_of(request_id)) > 0 do
