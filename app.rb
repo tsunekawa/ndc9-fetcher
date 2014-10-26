@@ -1,17 +1,6 @@
-require 'bundler'
-Bundler.require
-require 'sinatra/respond_with'
-
-# set up for Redis
-if ENV["REDISTOGO_URL"] != nil
-  uri = URI.parse(ENV["REDISTOGO_URL"])
-  $redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
-else
-  $redis = Redis.new host:"127.0.0.1", port:"6379"
-end
-
 class NDC9App < Sinatra::Base
   register Sinatra::RespondWith
+  helpers Sinatra::ContentFor
 
   # resolve url extention
   before /\..+$/ do
@@ -35,9 +24,68 @@ class NDC9App < Sinatra::Base
       error 406
     end
   end
+  
+  ###########################################
+  # Custion Exception
+  ###########################################
+  
+  class InvalidISBNError < StandardError; end
+  error InvalidISBNError do
+    status 400
+    message = "入力されたISBNが間違っています。(ISBN: #{env['sinatra.error'].message})"
 
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>400} }
+      f.txt  { "error 400 : #{message}" }
+      f.json { {:status=>"400", :message=>"error 400 : #{message}"}.to_json }
+    end
+  end
+
+  class MissingISBNError < StandardError; end
+  error MissingISBNError do
+    status 400
+    message = "入力データが空です。"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>400} }
+      f.txt  { "error 400 : #{message}" }
+      f.json { {:status=>"400", :message=>"error 400 : #{message}"}.to_json }
+    end
+  end
+
+  class InvalidMediaType < StandardError; end
+  error InvalidMediaType do
+    status 406
+    message = "#{env['sinatra.error'].message} は現在、入力フォーマットしてサポートしていません。"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>406} }
+      f.txt  { "error 406 : #{message}" }
+      f.json { {:status=>"406", :message=>"error 406 : #{message}"}.to_json }
+    end
+  end
+
+  error RequestIDNotFoundError do
+    status 404
+    message = "入力されたリクエストIDは存在しないか、既に削除されました。(入力されたリクエストID: #{env['sinatra.error'].message}"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>404} }
+      f.txt  { "error 404 : #{message}" }
+      f.json { {:status=>"404", :message=>"error 404 : #{message}"}.to_json }
+    end
+  end
+
+  ###########################################
+  # Routing
+  ###########################################
+ 
   get '/' do
     erb :index
+  end
+
+  get '/bulk' do
+    erb :bulk
   end
 
   # return a NDC9 code number which correspond to the ISBN
@@ -45,11 +93,9 @@ class NDC9App < Sinatra::Base
     isbn =  params[:isbn].gsub("-","")
     cache = (params[:cache] || "true")=="true"
 
-    ndc9 = cache(isbn, {:cache=>cache}) do
-      source = open("http://iss.ndl.go.jp/api/opensearch?dpid=iss-ndl-opac&isbn=#{isbn}&mediatype=1").read
-      doc    = Nokogiri::XML.parse(source)
-      doc.xpath("//channel/item/dc:subject[@xsi:type='dcndl:NDC9']/text()").to_s 
-    end
+    raise InvalidISBNError, isbn unless Lisbn.new(isbn).valid?
+
+    ndc9 = NDC9.fetch(isbn, {:cache=>cache})
 
     respond_to do |f|
       f.html { ndc9.to_s }
@@ -60,25 +106,72 @@ class NDC9App < Sinatra::Base
     end
   end
 
-  helpers do
-    def root_path
-      "#{request.scheme}://#{request.host_with_port}/"
+  post '/v1/isbn/bulk' do
+    cache = (params[:cache] || "true")=="true"
+
+    case request.media_type
+    when 'application/json'
+      data = JSON.parse request.body.read
+    when 'text/plain'
+      data = {"isbn"=>request.body.split("\n")}
+    when 'application/x-www-form-urlencoded'
+      data = {"isbn"=>params["isbn"].gsub("\r","").split("\n")}
+    else
+      raise InvalidMediaType, request.media_type
     end
 
-    # cache and return value with Redis
-    def cache(name, opts={}, &block)
-      cache = opts[:cache]
-      if cache then
-        if $redis.exists name then
-          $redis.get name
-        else
-          value = yield
-          $redis.set name, value
-          value
-        end
-      else
-        yield
+    # validate input data
+    if data["isbn"].size <= 0 then
+      raise MissingISBNError
+    else
+      error_isbns = data["isbn"].map{|isbn| Lisbn.new(isbn).valid? ? nil : isbn }.compact
+      raise InvalidISBNError, error_isbns.join(",") unless error_isbns.empty?
+    end
+
+    job_manager = JobManager.new
+
+    # generate request_id
+    request_id = job_manager.bulk_request(data["isbn"], {:cache=>cache})
+
+    respond_to do |f|
+      f.html { redirect "/v1/isbn/bulk/#{request_id}" }
+      f.txt  { "request id: #{request_id}" }
+      f.json { {:request_id=>request_id}.to_json }
+    end
+  end
+
+  get '/v1/isbn/bulk/:request_id' do
+    job_manager = JobManager.new
+    raise RequestIDNotFoundError unless job_manager.bulk_request_exists? params["request_id"]
+
+    request_id = params["request_id"]
+    result = job_manager.bulk_get(request_id)
+
+    if result.nil? then
+      status 102 # Processing
+      message = "Please wait...now processing"
+      respond_to do |f|
+        f.html { erb :'bulk_processing.html', locals: {:request_id=>request_id} }
+        f.json { {:status=>102, :message=>message, :request_id=>request_id}.to_json }
+        f.txt  { "#{message} (request ID: #{request_id})" }
       end
+    else
+      status 200 # OK
+      respond_to do |f|
+        f.html { erb :'bulk_get.html', locals: {:result=>result, :request_id=>params["request_id"]} }
+        f.json { result.to_json }
+        f.txt  { result.to_a.unshift(["isbn", "ndc9"]).map{|i| i.join("\t")}.join("\n") }
+      end
+    end
+  end
+
+  ###########################################
+  # Helper Methods
+  ###########################################
+
+  helpers do
+    def root_path
+      "#{request.scheme}://#{request.host_with_port}"
     end
   end
 end

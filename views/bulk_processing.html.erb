@@ -1,0 +1,16 @@
+<% content_for :header do %>
+<meta http-equiv="refresh" content="5"> 
+<% end %>
+
+<div class="page-header">
+  <h1><a href="<%= root_path %>">NDC9 Fetcher <small>- A Simple API Server for NDC9</small></a></h1>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2 class="panel-title">結果</h2>
+  </div>
+  <div class="panel-body">
+    <p>ID:<%= request_id %> は現在処理中です。5秒後に自動的に更新します。</p>
+  </div>
+</div>
