@@ -4,10 +4,14 @@ GEM
     backports (3.6.3)
     daemons (1.1.9)
     eventmachine (1.0.3)
+    lisbn (0.2.1)
+      nokogiri
+      nori (~> 2.0)
     mini_portile (0.6.0)
     multi_json (1.10.1)
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
+    nori (2.4.0)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
@@ -36,6 +40,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
+  lisbn
   nokogiri
   redis
   sinatra

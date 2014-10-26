@@ -23,7 +23,51 @@ class NDC9App < Sinatra::Base
       error 406
     end
   end
+  
+  ###########################################
+  # Custion Exception
+  ###########################################
+  
+  class InvalidISBNError < StandardError; end
+  error InvalidISBNError do
+    status 400
+    message = "入力されたISBNが間違っています。(ISBN: #{env['sinatra.error'].message})"
 
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>400} }
+      f.txt  { "error 400 : #{message}" }
+      f.json { {:status=>"400", :message=>"error 400 : #{message}"}.to_json }
+    end
+  end
+
+  class InvalidMediaType < StandardError; end
+  error InvalidMediaType do
+    status 406
+    message = "#{env['sinatra.error'].message} は現在、入力フォーマットしてサポートしていません。"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>406} }
+      f.txt  { "error 406 : #{message}" }
+      f.json { {:status=>"406", :message=>"error 406 : #{message}"}.to_json }
+    end
+  end
+
+  class RequestIDNotFoundError < StandardError; end
+  error RequestIDNotFoundError do
+    status 404
+    message = "入力されたリクエストIDは存在しないか、既に削除されました。(入力されたリクエストID: #{env['sinatra.error'].message}"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>404} }
+      f.txt  { "error 404 : #{message}" }
+      f.json { {:status=>"404", :message=>"error 404 : #{message}"}.to_json }
+    end
+  end
+
+  ###########################################
+  # Routing
+  ###########################################
+ 
   get '/' do
     erb :index
   end
@@ -36,6 +80,8 @@ class NDC9App < Sinatra::Base
   get '/v1/isbn/:isbn' do
     isbn =  params[:isbn].gsub("-","")
     cache = (params[:cache] || "true")=="true"
+
+    raise InvalidISBNError, isbn unless Lisbn.new(isbn).valid?
 
     ndc9 = NDC9.fetch(isbn, {:cache=>cache})
 
@@ -59,15 +105,22 @@ class NDC9App < Sinatra::Base
     when 'application/x-www-form-urlencoded'
       data = {"isbn"=>params["isbn"].gsub("\r","").split("\n")}
     else
-      error 406
+      raise InvalidMediaType, request.media_type
     end
 
+    # validate input data
     if data["isbn"].size <= 0 then
-      error 400
+      raise MissingISBNError
+    end
+    else
+      error_isbns = data["isbn"].map{|isbn| Lisbn.new(isbn).valid? ? nil : isbn }.compact
+      raise InvalidISBNError, error_isbns.join(",") unless error_isbns.empty?
     end
 
+    # generate request_id
     request_id = NDC9.bulk_request(data["isbn"], {:cache=>cache})
 
+    # delay fetching ndc9 with EventMachine
     EM.defer do
       NDC9.bulk_fetch(request_id)
     end
@@ -80,12 +133,19 @@ class NDC9App < Sinatra::Base
   end
 
   get '/v1/isbn/bulk/:request_id' do
-    halt 404 unless NDC9.bulk_request_exists? params["request_id"]
+    raise RequestIDNotFoundError unless NDC9.bulk_request_exists? params["request_id"]
 
-    result = NDC9.bulk_get(params["request_id"])
+    request_id = params["request_id"]
+    result = NDC9.bulk_get(request_id)
+
     if result.nil? then
       status 102 # Processing
-      "Please wait...now processing"
+      message = "Please wait...now processing"
+      respond_to do |f|
+        f.html { erb :'bulk_processing.html', locals: {:request_id=>request_id} }
+        f.json { {:status=>102, :message=>message, :request_id=>request_id}.to_json }
+        f.txt  { "#{message} (request ID: #{request_id})" }
+      end
     else
       status 200 # OK
       respond_to do |f|
@@ -95,6 +155,10 @@ class NDC9App < Sinatra::Base
       end
     end
   end
+
+  ###########################################
+  # Helper Methods
+  ###########################################
 
   helpers do
     def root_path
