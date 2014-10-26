@@ -2,6 +2,8 @@ class NDC9App < Sinatra::Base
   register Sinatra::RespondWith
   helpers Sinatra::ContentFor
 
+  BULK_LIMIT = (ENV["BULK_LIMIT"] || 100).to_i
+
   # resolve url extention
   before /\..+$/ do
     case request.url
@@ -45,6 +47,18 @@ class NDC9App < Sinatra::Base
   error MissingISBNError do
     status 400
     message = "入力データが空です。"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>400} }
+      f.txt  { "error 400 : #{message}" }
+      f.json { {:status=>"400", :message=>"error 400 : #{message}"}.to_json }
+    end
+  end
+
+  class OverBulkLimitError < StandardError; end
+  error OverBulkLimitError do
+    status 413
+    message = "入力されたデータの件数が上限を超えています。(現在の上限: #{BULK_LIMIT}件)"
 
     respond_to do |f|
       f.html { erb :error, locals: {:message=>message, :status=>400} }
@@ -123,6 +137,8 @@ class NDC9App < Sinatra::Base
     # validate input data
     if data["isbn"].size <= 0 then
       raise MissingISBNError
+    elsif data["isbn"].size > BULK_LIMIT then
+      raise OverBulkLimitError
     else
       error_isbns = data["isbn"].map{|isbn| Lisbn.new(isbn).valid? ? nil : isbn }.compact
       raise InvalidISBNError, error_isbns.join(",") unless error_isbns.empty?
