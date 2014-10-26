@@ -1,5 +1,6 @@
 class NDC9App < Sinatra::Base
   register Sinatra::RespondWith
+  helpers Sinatra::ContentFor
 
   # resolve url extention
   before /\..+$/ do
@@ -64,7 +65,6 @@ class NDC9App < Sinatra::Base
     end
   end
 
-  class RequestIDNotFoundError < StandardError; end
   error RequestIDNotFoundError do
     status 404
     message = "入力されたリクエストIDは存在しないか、既に削除されました。(入力されたリクエストID: #{env['sinatra.error'].message}"
@@ -123,19 +123,15 @@ class NDC9App < Sinatra::Base
     # validate input data
     if data["isbn"].size <= 0 then
       raise MissingISBNError
-    end
     else
       error_isbns = data["isbn"].map{|isbn| Lisbn.new(isbn).valid? ? nil : isbn }.compact
       raise InvalidISBNError, error_isbns.join(",") unless error_isbns.empty?
     end
 
-    # generate request_id
-    request_id = NDC9.bulk_request(data["isbn"], {:cache=>cache})
+    job_manager = JobManager.new
 
-    # delay fetching ndc9 with EventMachine
-    EM.defer do
-      NDC9.bulk_fetch(request_id)
-    end
+    # generate request_id
+    request_id = job_manager.bulk_request(data["isbn"], {:cache=>cache})
 
     respond_to do |f|
       f.html { redirect "/v1/isbn/bulk/#{request_id}" }
@@ -145,10 +141,11 @@ class NDC9App < Sinatra::Base
   end
 
   get '/v1/isbn/bulk/:request_id' do
-    raise RequestIDNotFoundError unless NDC9.bulk_request_exists? params["request_id"]
+    job_manager = JobManager.new
+    raise RequestIDNotFoundError unless job_manager.bulk_request_exists? params["request_id"]
 
     request_id = params["request_id"]
-    result = NDC9.bulk_get(request_id)
+    result = job_manager.bulk_get(request_id)
 
     if result.nil? then
       status 102 # Processing

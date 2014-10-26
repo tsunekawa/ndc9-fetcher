@@ -10,4 +10,5 @@ else
 end
 
 require_relative '../lib/ndc9'
+require_relative '../lib/job_manager'
 require_relative '../app'
