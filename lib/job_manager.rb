@@ -46,7 +46,7 @@ class JobManager
   end
 
   def bulk_fetch(request_id)
-    raise RequestIDNotFound unless $redis.exists request_key_of(request_id)
+    raise ::RequestIDNotFound unless $redis.exists request_key_of(request_id)
     $redis.renamenx request_key_of(request_id), processing_key_of(request_id)
 
     while $redis.llen(processing_key_of(request_id)) > 0 do
