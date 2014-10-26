@@ -40,6 +40,18 @@ class NDC9App < Sinatra::Base
     end
   end
 
+  class MissingISBNError < StandardError; end
+  error MissingISBNError do
+    status 400
+    message = "入力データが空です。"
+
+    respond_to do |f|
+      f.html { erb :error, locals: {:message=>message, :status=>400} }
+      f.txt  { "error 400 : #{message}" }
+      f.json { {:status=>"400", :message=>"error 400 : #{message}"}.to_json }
+    end
+  end
+
   class InvalidMediaType < StandardError; end
   error InvalidMediaType do
     status 406
