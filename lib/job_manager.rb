@@ -4,8 +4,19 @@ class ProcessingException < StandardError; end
 class JobManager
   BULK_EXPIRE = 43200 # 6 hours
 
+  def request_id_list
+    $redis.keys(request_key_of("*")).map{|key| key.gsub("request:","")}
+  end
+
+  def processing_id_list
+    $redis.keys(processing_key_of("*")).map{|key| key.gsub("processing:","")}
+  end
+
+  def result_id_list
+    $redis.keys(result_key_of("*")).map{|key| key.gsub("result:","")}
+  end
+
   def random_exec
-    request_id_list = $redis.keys request_key_of("*")
     if request_id_list.empty? then
       nil
     else

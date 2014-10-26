@@ -1,6 +1,13 @@
 require './config/boot'
 
-run NDC9App
+if ENV["ADMIN_USERNAME"].nil? or ENV["ADMIN_PASSWORD"].nil? then
+  run NDC9App
+else
+  run Rack::URLMap.new({
+    "/" => NDC9App,
+    "/admin" => AdminApp
+  })
+end
 
 # processing background job
 EM::defer do
