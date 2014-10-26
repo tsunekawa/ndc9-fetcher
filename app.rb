@@ -99,7 +99,7 @@ class NDC9App < Sinatra::Base
 
     respond_to do |f|
       f.html { ndc9.to_s }
-      f.xml  { erb :'isbn.rdf', locals: {:isbn=>isbn, :ndc9=>ndc9} }
+      f.xml  { erb :'isbn.rdf', locals: {:isbn=>isbn, :ndc9=>ndc9}, layout:false }
       f.on('application/rdf+xml') { erb :'isbn.rdf', locals: {:isbn=>isbn, :ndc9=>ndc9} }
       f.json { {:isbn=>isbn, :ndc9=>ndc9.to_s}.to_json }
       f.txt  { ndc9.to_s }
