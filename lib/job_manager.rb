@@ -51,7 +51,7 @@ class JobManager
 
     while $redis.llen(processing_key_of(request_id)) > 0 do
       isbn = $redis.lindex(processing_key_of(request_id), 0)
-      ndc9 = NDC9.fetch(isbn)
+      ndc9 = NDC9.new(:redis=>$redis).fetch(isbn)
       $redis.multi do
         $redis.lpop processing_key_of(request_id)
         $redis.hset result_key_of(request_id), isbn, ndc9

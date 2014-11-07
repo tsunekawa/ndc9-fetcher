@@ -31,8 +31,7 @@ class NDC9App < Sinatra::Base
   # Custion Exception
   ###########################################
   
-  class InvalidISBNError < StandardError; end
-  error InvalidISBNError do
+  error NDC9::InvalidISBNError do
     status 400
     message = "入力されたISBNが間違っています。(ISBN: #{env['sinatra.error'].message})"
 
@@ -107,9 +106,7 @@ class NDC9App < Sinatra::Base
     isbn =  params[:isbn].gsub("-","")
     cache = (params[:cache] || "true")=="true"
 
-    raise InvalidISBNError, isbn unless Lisbn.new(isbn).valid?
-
-    ndc9 = NDC9.fetch(isbn, {:cache=>cache})
+    ndc9 = NDC9.new(:redis=>$redis).fetch(isbn, {:cache=>cache})
 
     respond_to do |f|
       f.html { ndc9.to_s }
