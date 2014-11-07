@@ -1,3 +1,4 @@
+$:.unshift File.expand_path("./lib")
 require 'bundler'
 Bundler.require
 
@@ -8,7 +9,3 @@ if ENV["REDISTOGO_URL"] != nil
 else
   $redis = Redis.new host:"127.0.0.1", port:"6379"
 end
-
-$:.unshift File.expand_path("./lib")
-require 'ndc9_fetcher/app'
-require 'ndc9_fetcher/admin_app'

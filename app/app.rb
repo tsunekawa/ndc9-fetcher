@@ -1,3 +1,4 @@
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'ndc9_fetcher/ndc9'
 require 'ndc9_fetcher/job_manager'
 
@@ -9,7 +10,7 @@ module Ndc9Fetcher
     BULK_LIMIT = (ENV["BULK_LIMIT"] || 100).to_i
 
     set :root, File.dirname(__FILE__)
-    set :views, Proc.new { File.join(root, "app", "views") }
+    set :views, Proc.new { File.join(root, "views") }
 
     # resolve url extention
     before /\..+$/ do

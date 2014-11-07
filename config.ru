@@ -1,4 +1,6 @@
 require './config/boot'
+require './app/app'
+require './app/admin_app'
 
 if ENV["ADMIN_USERNAME"].nil? or ENV["ADMIN_PASSWORD"].nil? then
   run Ndc9Fetcher::App
