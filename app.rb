@@ -173,7 +173,7 @@ class NDC9App < Sinatra::Base
       respond_to do |f|
         f.html { erb :'bulk_get.html', locals: {:result=>result, :request_id=>params["request_id"]} }
         f.json { result.to_json }
-        f.txt  { result.to_a.unshift(["isbn", "ndc9"]).map{|i| i.join("\t")}.join("\n") }
+        f.txt  { result.to_a.unshift(["isbn", "ndc9"]).map{|i| i.map{|s| "\"#{s}\""}.join("\t") }.join("\n") }
       end
     end
   end
