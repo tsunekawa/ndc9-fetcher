@@ -1,17 +1,17 @@
 require './config/boot'
 
 if ENV["ADMIN_USERNAME"].nil? or ENV["ADMIN_PASSWORD"].nil? then
-  run NDC9App
+  run Ndc9Fetcher::App
 else
   run Rack::URLMap.new({
-    "/" => NDC9App,
-    "/admin" => AdminApp
+    "/" => Ndc9Fetcher::App,
+    "/admin" => Ndc9Fetcher::AdminApp
   })
 end
 
 # processing background job
 EM::defer do
-  job_manager = JobManager.new
+  job_manager = Ndc9Fetcher::JobManager.new
   loop do
     sleep 3
     job_manager.random_exec

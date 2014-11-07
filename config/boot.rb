@@ -9,7 +9,6 @@ else
   $redis = Redis.new host:"127.0.0.1", port:"6379"
 end
 
-require_relative '../lib/ndc9'
-require_relative '../lib/job_manager'
-require_relative '../app'
-require_relative '../admin_app'
+$:.unshift File.expand_path("./lib")
+require 'ndc9_fetcher/app'
+require 'ndc9_fetcher/admin_app'
