@@ -1,7 +1,3 @@
-$:.unshift File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
-require 'ndc9_fetcher/ndc9'
-require 'ndc9_fetcher/job_manager'
-
 module Ndc9Fetcher
   class App < Sinatra::Base
     register Sinatra::RespondWith
@@ -149,7 +145,7 @@ module Ndc9Fetcher
         raise InvalidISBNError, error_isbns.join(",") unless error_isbns.empty?
       end
 
-      job_manager = JobManager.new
+      job_manager = JobManager.new(:redis=>$redis)
 
       # generate request_id
       request_id = job_manager.bulk_request(data["isbn"], {:cache=>cache})

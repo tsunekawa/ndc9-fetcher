@@ -1,6 +1,4 @@
 require './config/boot'
-require './app/app'
-require './app/admin_app'
 
 if ENV["ADMIN_USERNAME"].nil? or ENV["ADMIN_PASSWORD"].nil? then
   run Ndc9Fetcher::App
@@ -13,7 +11,7 @@ end
 
 # processing background job
 EM::defer do
-  job_manager = Ndc9Fetcher::JobManager.new
+  job_manager = Ndc9Fetcher::JobManager.new(:redis=>$redis)
   loop do
     sleep 3
     job_manager.random_exec
