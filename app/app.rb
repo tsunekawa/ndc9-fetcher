@@ -109,8 +109,10 @@ module Ndc9Fetcher
     get '/v1/isbn/:isbn' do
       isbn =  params[:isbn].gsub("-","")
       cache = (params[:cache] || "true")=="true"
+      prefix = params[:prefix]
 
       ndc9 = NDC9.new(:redis=>$redis).fetch(isbn, {:cache=>cache})
+      ndc9 = prefix+ndc9 unless prefix.nil?
 
       respond_to do |f|
         f.html { ndc9.to_s }
