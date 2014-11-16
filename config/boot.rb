@@ -10,11 +10,6 @@ else
   Bundler.require(:default)
 end
 
-require 'ndc9_fetcher/ndc9'
-require 'ndc9_fetcher/job_manager'
-require './app/app'
-require './app/admin_app'
-
 # set up for Redis
 if ENV["REDISTOGO_URL"] != nil
   uri = URI.parse(ENV["REDISTOGO_URL"])
