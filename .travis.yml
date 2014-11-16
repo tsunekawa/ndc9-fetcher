@@ -1,0 +1,17 @@
+language: ruby
+rvm:
+- 2.0.0
+- 2.1.2
+services:
+- redis-server
+deploy:
+  provider: heroku
+  api_key:
+    secure: BuOPdW+tk+WrhP52bp8bj0YcddNA+iV144/rk7WugbG63VjH4nanMBmowfsgbpzXdxsu880Qde0an5Fp61hDFxnPaQRbRzCIr09oEJ5KUd/Gjz9UQbdvitKL9vS5HaxujDv10Mjku8KEIviCFzYcqxrZp82hehnOg9qQfCcqQIQ=
+  app:
+    master: ndc9
+    dev: ndc9-staging
+  on:
+    strategy: git
+    repo: tsunekawa/ndc9-fetcher
+    rvm: 2.0.0

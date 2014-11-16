@@ -1,5 +1,8 @@
 NDC9 Fetcher - A Simple API Server for NDC9
 ===========================================
+dev: [![Build Status dev](https://travis-ci.org/tsunekawa/ndc9-fetcher.svg?branch=dev)](https://travis-ci.org/tsunekawa/ndc9-fetcher)
+master: [![Build Status master](https://travis-ci.org/tsunekawa/ndc9-fetcher.svg?branch=master)](https://travis-ci.org/tsunekawa/ndc9-fetcher)
+
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/tsunekawa/ndc9-fetcher)
 
 ## About
@@ -33,7 +36,7 @@ $ foreman start
 
 ### 特定のISBNからNDC番号を取得する場合
 
-* URL: https://ndc9.herokuapp.com/v1/isbn/(ISBN) 
+* URL: https://ndc9.herokuapp.com/v1/isbn/(ISBN)
 * 例:
   * テキスト形式で出力： [https://ndc9.herokuapp.com/v1/isbn/978-4061190696](https://ndc9.herokuapp.com/v1/isbn/978-4061190696)
   * JSON形式で出力： [https://ndc9.herokuapp.com/v1/isbn/978-4061190696.json](https://ndc9.herokuapp.com/v1/isbn/978-4061190696.json)
