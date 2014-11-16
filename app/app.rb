@@ -30,11 +30,11 @@ module Ndc9Fetcher
         error 406
       end
     end
-    
+
     ###########################################
     # Custion Exception
     ###########################################
-    
+
     error ::Ndc9Fetcher::InvalidISBNError do
       status 400
       message = "入力されたISBNが間違っています。(ISBN: #{env['sinatra.error'].message})"
@@ -96,7 +96,7 @@ module Ndc9Fetcher
     ###########################################
     # Routing
     ###########################################
-   
+
     get '/' do
       erb :index
     end
@@ -109,8 +109,10 @@ module Ndc9Fetcher
     get '/v1/isbn/:isbn' do
       isbn =  params[:isbn].gsub("-","")
       cache = (params[:cache] || "true")=="true"
+      prefix = params[:prefix]
 
       ndc9 = NDC9.new(:redis=>$redis).fetch(isbn, {:cache=>cache})
+      ndc9 = prefix+ndc9 unless prefix.nil?
 
       respond_to do |f|
         f.html { ndc9.to_s }
@@ -158,7 +160,7 @@ module Ndc9Fetcher
     end
 
     get '/v1/isbn/bulk/:request_id' do
-      job_manager = JobManager.new
+      job_manager = JobManager.new(:redis=>$redis)
       raise RequestIDNotFoundError unless job_manager.bulk_request_exists? params["request_id"]
 
       request_id = params["request_id"]

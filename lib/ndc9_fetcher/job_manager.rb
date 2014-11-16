@@ -85,13 +85,11 @@ module Ndc9Fetcher
     private
 
     def setup_redis(arg)
-      if arg.instance_of? String then
-        redis_uri = URI.parse( (opt[:redis] || "redis://127.0.0.1:6379") )
-        @redis = Redis.new(:host=>uri.host, :port=>uri.port, :password => uri.password)
-      elsif arg.instance_of? Redis then
+      if arg.instance_of? Redis then
         @redis = arg
       else
-        @redis = Redis.new host:"127.0.0.1", port:"6379"
+        uri = URI.parse(arg)
+        @redis = Redis.new(:host=>uri.host, :port=>uri.port, :password => uri.password)
       end
     end
 
