@@ -8,7 +8,8 @@ deploy:
   provider: heroku
   api_key:
     secure: BuOPdW+tk+WrhP52bp8bj0YcddNA+iV144/rk7WugbG63VjH4nanMBmowfsgbpzXdxsu880Qde0an5Fp61hDFxnPaQRbRzCIr09oEJ5KUd/Gjz9UQbdvitKL9vS5HaxujDv10Mjku8KEIviCFzYcqxrZp82hehnOg9qQfCcqQIQ=
-  app: ndc9
+  app:
+    master: ndc9
+    dev: ndc9-staging
   on:
     repo: tsunekawa/ndc9-fetcher
-    branch: dev
