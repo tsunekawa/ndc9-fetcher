@@ -1,6 +1,14 @@
 $:.unshift File.expand_path("./lib")
 require 'bundler'
-Bundler.require
+
+case ENV['RACK_ENV']
+when 'test'
+  Bundler.require(:default, :test)
+when 'development'
+  Bundler.require(:default, :development)
+else
+  Bundler.require(:default)
+end
 
 require 'ndc9_fetcher/ndc9'
 require 'ndc9_fetcher/job_manager'
@@ -14,3 +22,8 @@ if ENV["REDISTOGO_URL"] != nil
 else
   $redis = Redis.new host:"127.0.0.1", port:"6379"
 end
+
+require 'ndc9_fetcher/ndc9'
+require 'ndc9_fetcher/job_manager'
+require './app/app'
+require './app/admin_app'

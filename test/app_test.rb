@@ -1,11 +1,12 @@
 require './test/test_helper'
 
-describe 'Ndc9Fetcher App' do
-  include Rack::Test::Methods
+include Rack::Test::Methods
 
-  def app
-    Ndc9Fetcher::App
-  end
+def app
+  Ndc9Fetcher::App
+end
+
+describe 'Ndc9Fetcher App' do
 
   it 'get / returns OK' do
     get '/'

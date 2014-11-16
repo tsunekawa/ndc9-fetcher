@@ -11,3 +11,14 @@ gem 'bundler', require: [
   "open-uri",
   "json"
 ]
+
+group :test do
+  gem 'rake'
+  gem 'vcr'
+  gem 'webmock'
+  gem 'minitest', require: [
+    'minitest/autorun',
+    'rack/test'
+  ]
+  gem 'minitest-reporters', require: ["minitest/reporters"]
+end
