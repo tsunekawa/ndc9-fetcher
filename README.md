@@ -1,6 +1,7 @@
 NDC9 Fetcher - A Simple API Server for NDC9
 ===========================================
-![travis ci](https://api.travis-ci.org/tsunekawa/ndc9-fetcher.svg)
+dev: [![Build Status dev](https://travis-ci.org/tsunekawa/ndc9-fetcher.svg?branch=dev)](https://travis-ci.org/tsunekawa/ndc9-fetcher)
+master: [![Build Status master](https://travis-ci.org/tsunekawa/ndc9-fetcher.svg?branch=master)](https://travis-ci.org/tsunekawa/ndc9-fetcher)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/tsunekawa/ndc9-fetcher)
 
