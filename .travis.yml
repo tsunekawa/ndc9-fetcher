@@ -12,4 +12,6 @@ deploy:
     master: ndc9
     dev: ndc9-staging
   on:
+    strategy: git
     repo: tsunekawa/ndc9-fetcher
+    rvm: 2.0.0
